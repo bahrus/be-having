@@ -1,6 +1,20 @@
 import { register } from 'be-hive/register.js';
 import { define } from 'be-decorated/DE.js';
 export class BeHaving extends EventTarget {
+    importSymbols(pp) {
+        const { self } = pp;
+        if (self._modExport) {
+            return {
+                readyToObserve: true,
+            };
+        }
+        return [{}, {
+                setReadyToObserve: { on: 'load', of: self }
+            }];
+    }
+    setReadyToObserve(pp) {
+        return { readyToObserve: true };
+    }
     #observer;
     #queries = new Map();
     async makeBe(pp) {
@@ -24,7 +38,7 @@ export class BeHaving extends EventTarget {
                             cssSelector = qry.query;
                         }
                         if (node.matches(cssSelector)) {
-                            await this.#processEl(node, rule, make);
+                            await this.#processEl(node, key, make);
                         }
                     }
                 });
@@ -66,11 +80,19 @@ define({
             ifWantsToBe,
             upgrade,
             forceVisible: ['script'],
-            virtualProps: [],
-            proxyPropDefaults: {}
+            virtualProps: ['make', 'loadScript'],
+            proxyPropDefaults: {
+                loadScript: true,
+            }
         },
         actions: {
-            makeBe: 'make'
+            makeBe: {
+                ifAllOf: ['make', 'readyToObserve'],
+            },
+            importSymbols: 'loadScript',
+            setReadyToObserve: {
+                ifNoneOf: ['loadScript']
+            }
         },
     },
     complexPropDefaults: {

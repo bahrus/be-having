@@ -5,6 +5,23 @@ import {BeHaving as BeHavingType, QueryInfo, CSSSelectorBeHavingMap} from 'trans
 
 export class BeHaving extends EventTarget implements Actions{
 
+
+    importSymbols(pp: ProxyProps){
+        const {self} = pp;
+        if((self as any)._modExport){
+            return {
+                readyToObserve: true,
+            } as PPP;
+        }
+        return [{}, {
+            setReadyToObserve: {on: 'load', of: self}
+        }] as PPE;
+    }
+
+    setReadyToObserve(pp: PP): PPP {
+        return {readyToObserve: true};
+    }
+
     #observer: MutationObserver | undefined;
     #queries: Map<string, QueryInfo> = new Map();
     async makeBe(pp: PP){
@@ -28,7 +45,7 @@ export class BeHaving extends EventTarget implements Actions{
                             
                         }
                         if(node.matches(cssSelector)){
-                            await this.#processEl(node, rule, make);
+                            await this.#processEl(node, key, make);
                         }
                     }
                 })
@@ -76,13 +93,19 @@ define<PPP & BeDecoratedProps<PPP, Actions>, Actions>({
             ifWantsToBe,
             upgrade,
             forceVisible: ['script'],
-            virtualProps: [],
+            virtualProps: ['make', 'loadScript'],
             proxyPropDefaults:{
-
+                loadScript: true,
             }
         },
         actions: {
-            makeBe: 'make'
+            makeBe: {
+                ifAllOf: ['make', 'readyToObserve'],
+            },
+            importSymbols: 'loadScript',
+            setReadyToObserve: {
+                ifNoneOf: ['loadScript']
+            }
         },
     },
     complexPropDefaults: {
