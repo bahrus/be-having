@@ -1,16 +1,48 @@
 import { register } from 'be-hive/register.js';
 import { define } from 'be-decorated/DE.js';
 export class BeHaving extends EventTarget {
-    importSymbols(pp) {
+    makeSelfBeExportable(pp) {
         const { self } = pp;
         if (self._modExport) {
             return {
-                readyToObserve: true,
+                importSymbols: true,
             };
         }
+        self.setAttribute('be-exportable', '');
+        import('be-exportable/be-exportable.js');
         return [{}, {
-                setReadyToObserve: { on: 'load', of: self, }
+                importSymbols: { on: 'load', of: self, }
             }];
+    }
+    importSymbols(pp) {
+        const { make, self } = pp;
+        const exports = self._modExport;
+        for (const key in make) {
+            const ruleOrRules = make[key];
+            const rules = Array.isArray(ruleOrRules) ? ruleOrRules : [ruleOrRules];
+            for (const rule of rules) {
+                const { be, having } = rule;
+                const impConfig = exports[be];
+                const { impl } = impConfig;
+                const impls = Array.isArray(impl) ? impl : [impl];
+                for (const imp of impls) {
+                    try {
+                        imp();
+                        break;
+                    }
+                    catch (e) { }
+                }
+                if (typeof having === 'string') {
+                    const complexHaving = exports[having];
+                    if (complexHaving !== undefined) {
+                        rule.having = complexHaving;
+                    }
+                }
+            }
+        }
+        return {
+            readyToObserve: true,
+        };
     }
     setReadyToObserve(pp) {
         return { readyToObserve: true };
@@ -89,7 +121,7 @@ define({
             makeBe: {
                 ifAllOf: ['make', 'readyToObserve'],
             },
-            importSymbols: 'loadScript',
+            makeSelfBeExportable: 'loadScript',
             setReadyToObserve: {
                 ifNoneOf: ['loadScript']
             }
