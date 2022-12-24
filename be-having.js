@@ -9,7 +9,7 @@ export class BeHaving extends EventTarget {
             };
         }
         return [{}, {
-                setReadyToObserve: { on: 'load', of: self }
+                setReadyToObserve: { on: 'load', of: self, }
             }];
     }
     setReadyToObserve(pp) {

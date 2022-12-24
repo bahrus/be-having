@@ -1,21 +1,47 @@
 import {register} from 'be-hive/register.js';
 import {define, BeDecoratedProps} from 'be-decorated/DE.js';
-import {Actions, PP, PPE, VirtualProps, Proxy, ProxyProps, PPP} from './types';
+import {Actions, PP, PPE, VirtualProps, Proxy, ProxyProps, PPP, ImportConfig} from './types';
 import {BeHaving as BeHavingType, QueryInfo, CSSSelectorBeHavingMap} from 'trans-render/lib/types';
 
 export class BeHaving extends EventTarget implements Actions{
 
 
-    importSymbols(pp: ProxyProps){
+    makeSelfBeExportable(pp: ProxyProps){
         const {self} = pp;
         if((self as any)._modExport){
             return {
-                readyToObserve: true,
+                importSymbols: true,
             } as PPP;
         }
+        self.setAttribute('be-exportable', '');
+        import('be-exportable/be-exportable.js');
         return [{}, {
-            setReadyToObserve: {on: 'load', of: self}
+            importSymbols: {on: 'load', of: self, }
         }] as PPE;
+    }
+
+    importSymbols(pp: PP): PPP | PPE {
+        const {make, self} = pp;
+        const exports = (self as any)._modExport;
+        for(const key in make){
+            const ruleOrRules = make[key]
+            const rules = Array.isArray(ruleOrRules) ? ruleOrRules : [ruleOrRules];
+            for(const rule of rules){
+                const {be} = rule;
+                const impConfig = exports[be] as ImportConfig;
+                const {impl} = impConfig;
+                const impls = Array.isArray(impl) ? impl : [impl];
+                for(const imp of impls){
+                    try{
+                        imp();
+                        break;
+                    }catch(e){}
+                }
+            }
+        }
+        return {
+            readyToObserve: true,
+        }
     }
 
     setReadyToObserve(pp: PP): PPP {
@@ -102,7 +128,7 @@ define<PPP & BeDecoratedProps<PPP, Actions>, Actions>({
             makeBe: {
                 ifAllOf: ['make', 'readyToObserve'],
             },
-            importSymbols: 'loadScript',
+            makeSelfBeExportable: 'loadScript',
             setReadyToObserve: {
                 ifNoneOf: ['loadScript']
             }

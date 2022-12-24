@@ -23,6 +23,11 @@ export type PPE = [PPP, EventConfigs<Proxy, Actions>];
 
 export interface Actions{
     makeBe(pp: PP): void;
+    makeSelfBeExportable(pp: PP): PPP | PPE;
     importSymbols(pp: PP): PPP | PPE;
     setReadyToObserve(pp: PP): PPP;
+}
+
+export interface ImportConfig {
+    impl: (() => void) | (() => void)[]; 
 }

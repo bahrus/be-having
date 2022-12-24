@@ -16,7 +16,6 @@
     }
 }'> 
     import 'be-reformable/be-reformable.js'
-    //lazy load, multiple tries
     export const counted = {
         impl:  () => import('be-counted/be-counted.js');
     };
@@ -26,7 +25,7 @@
 
     export const formHavingProps = {
         
-    }
+    };
 </script>
 ```
 
