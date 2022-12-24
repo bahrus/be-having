@@ -59,7 +59,8 @@ export class BeHaving extends EventTarget implements Actions{
     async makeBe(pp: PP){
         const {make, self, scope} = pp;
         const {findRealm} = await import('trans-render/lib/findRealm.js');
-        const fragment = await findRealm(self, scope);
+        const fragment = await findRealm(self, scope) as DocumentFragment;
+        if(fragment === null) throw '404: BH.makeBE';
         //const rootNode = self.getRootNode() as DocumentFragment;
         this.#observer = new MutationObserver(mutations => {
             mutations.forEach(({addedNodes}) => {
@@ -101,7 +102,7 @@ export class BeHaving extends EventTarget implements Actions{
                 const qry = this.#queries.get(key)!;
                 cssSelector = qry.query;
             }
-            rootNode.querySelectorAll(cssSelector).forEach(async node => {
+            fragment.querySelectorAll(cssSelector).forEach(async node => {
                 await this.#processEl(node, key, make);
             })
         }
