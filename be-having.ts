@@ -27,7 +27,7 @@ export class BeHaving extends EventTarget implements Actions{
             const ruleOrRules = make[key]
             const rules = Array.isArray(ruleOrRules) ? ruleOrRules : [ruleOrRules];
             for(const rule of rules){
-                const {be} = rule;
+                const {be, having} = rule;
                 const impConfig = exports[be] as ImportConfig;
                 const {impl} = impConfig;
                 const impls = Array.isArray(impl) ? impl : [impl];
@@ -36,6 +36,12 @@ export class BeHaving extends EventTarget implements Actions{
                         imp();
                         break;
                     }catch(e){}
+                }
+                if(typeof having === 'string'){
+                    const complexHaving = exports[having];
+                    if(complexHaving !== undefined){
+                        rule.having = complexHaving;
+                    }
                 }
             }
         }
