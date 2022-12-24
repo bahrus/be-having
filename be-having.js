@@ -50,8 +50,10 @@ export class BeHaving extends EventTarget {
     #observer;
     #queries = new Map();
     async makeBe(pp) {
-        const { make, self } = pp;
-        const rootNode = self.getRootNode();
+        const { make, self, scope } = pp;
+        const { findRealm } = await import('trans-render/lib/findRealm.js');
+        const fragment = await findRealm(self, scope);
+        //const rootNode = self.getRootNode() as DocumentFragment;
         this.#observer = new MutationObserver(mutations => {
             mutations.forEach(({ addedNodes }) => {
                 addedNodes.forEach(async (node) => {
@@ -76,7 +78,7 @@ export class BeHaving extends EventTarget {
                 });
             });
         });
-        this.#observer.observe(rootNode, {
+        this.#observer.observe(fragment, {
             childList: true,
             subtree: true,
         });
@@ -112,9 +114,10 @@ define({
             ifWantsToBe,
             upgrade,
             forceVisible: ['script'],
-            virtualProps: ['make', 'loadScript'],
+            virtualProps: ['make', 'loadScript', 'scope'],
             proxyPropDefaults: {
                 loadScript: true,
+                scope: 'rn'
             }
         },
         actions: {

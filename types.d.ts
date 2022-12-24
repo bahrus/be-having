@@ -1,8 +1,9 @@
 import {BeDecoratedProps, MinimalProxy, EventConfigs} from 'be-decorated/types';
-import {CSSSelectorBeHavingMap} from 'trans-render/lib/types';
+import {CSSSelectorBeHavingMap, Scope} from 'trans-render/lib/types';
 export interface EndUserProps{
     make: CSSSelectorBeHavingMap,
     loadScript: boolean,
+    scope: Scope,
 }
 
 export interface  VirtualProps extends EndUserProps, MinimalProxy{
