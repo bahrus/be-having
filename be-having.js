@@ -25,12 +25,21 @@ export class BeHaving extends EventTarget {
                 const impConfig = exports[be];
                 const { impl } = impConfig;
                 const impls = Array.isArray(impl) ? impl : [impl];
+                let didImport = false;
+                const failures = [];
                 for (const imp of impls) {
                     try {
                         imp();
+                        didImport = true;
                         break;
                     }
-                    catch (e) { }
+                    catch (e) {
+                        console.debug(e);
+                        failures.push(e);
+                    }
+                }
+                if (!didImport) {
+                    throw { msg: 'Failure to import', impls, failures };
                 }
                 if (typeof having === 'string') {
                     const complexHaving = exports[having];
@@ -63,7 +72,6 @@ export class BeHaving extends EventTarget {
                         return;
                     for (const key in make) {
                         const rule = make[key];
-                        //TODO - memoize
                         let cssSelector = key;
                         if (hasCapitalLetterRegExp.test(key)) {
                             if (!this.#queries.has(key)) {

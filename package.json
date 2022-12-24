@@ -1,8 +1,19 @@
 {
   "name": "be-having",
   "version": "0.0.1",
-  "description": "",
-  "main": "index.js",
+  "description": "Apply element decorators / behaviors from a distance.",
+  "keywords": [
+    "web-components",
+    "web-component",
+    "custom-element",
+    "custom-elements"
+  ],
+  "main": "be-having.js",
+  "module": "be-having.js",
+  "exports": {
+    ".": "./be-having.js",
+    "./be-having.js": "./be-having.js"
+  },
   "files": [
     "*.*"
   ],

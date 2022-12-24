@@ -1,5 +1,7 @@
 # be-having
 
+Apply element decorators / behaviors from a distance.
+
 ```html
 <script nomodule be-having='{
     "make": {

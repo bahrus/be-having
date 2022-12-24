@@ -31,11 +31,20 @@ export class BeHaving extends EventTarget implements Actions{
                 const impConfig = exports[be] as ImportConfig;
                 const {impl} = impConfig;
                 const impls = Array.isArray(impl) ? impl : [impl];
+                let didImport = false;
+                const failures: any[] = [];
                 for(const imp of impls){
                     try{
                         imp();
+                        didImport = true;
                         break;
-                    }catch(e){}
+                    }catch(e){
+                        console.debug(e);
+                        failures.push(e);
+                    }
+                }
+                if(!didImport){
+                    throw {msg: 'Failure to import', impls, failures}
                 }
                 if(typeof having === 'string'){
                     const complexHaving = exports[having];
@@ -68,7 +77,6 @@ export class BeHaving extends EventTarget implements Actions{
                     if(!(node instanceof Element)) return;
                     for(const key in make){
                         const rule = make[key];
-                        //TODO - memoize
                         let cssSelector = key;
                         if(hasCapitalLetterRegExp.test(key)){
                             if(!this.#queries.has(key)){
