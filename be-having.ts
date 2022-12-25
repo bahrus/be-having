@@ -9,33 +9,53 @@ export class BeHaving extends EventTarget implements Actions{
     makeSelfBeExportable(pp: ProxyProps){
         const {self} = pp;
         if((self as any)._modExport){
-            return {
-                importSymbols: true,
-            } as PPP;
+            return [{}, {
+                importMake: true,
+            }] as PPE;
         }
         self.setAttribute('be-exportable', '');
         import('be-exportable/be-exportable.js');
         return [{}, {
-            importSymbols: {on: 'load', of: self, }
+            importMake: {on: 'load', of: self, },
         }] as PPE;
     }
 
-    async importSymbols(pp: PP): Promise<PPP | PPE> {
+    async importMake(pp: PP): Promise<PPP | PPE> {
         const {make, self} = pp;
         const exports = (self as any)._modExport;
         const mergedMake = make || {};
-        const externalMakePromiseOrPromises = exports.make as () => Promise<any> | (() => Promise<any>)[];
+        const externalMakePromiseOrPromises = exports.make as string | string[];
         if(externalMakePromiseOrPromises !== undefined){
             const externalMakePromises = Array.isArray(externalMakePromiseOrPromises) ? externalMakePromiseOrPromises : [externalMakePromiseOrPromises];
+            const failures: any[] = [];
+            let didImport = false;
             for(const externalMakePromise of externalMakePromises){
                 try{
-                    const externalMake = await externalMakePromise();
+                    const externalMake = await import(externalMakePromise);
                     Object.assign(mergedMake, externalMake.make);
-                }catch(e){}
+                    didImport = true;
+                    break;
+                }catch(e){
+                    console.debug(e);
+                    failures.push(e);
+                }
+            }
+            if(!didImport){
+                throw {msg: 'Failure to import', externalMakePromiseOrPromises, failures}
             }
         }
-        for(const key in mergedMake){
-            const ruleOrRules = mergedMake[key]
+
+        return {
+            make: mergedMake,
+            readyToObserve: true,
+        }
+    }
+
+    async doImports(pp: PP){
+        const {make, self} = pp;
+        const exports = (self as any)._modExport;
+        for(const key in make){
+            const ruleOrRules = make[key]
             const rules = Array.isArray(ruleOrRules) ? ruleOrRules : [ruleOrRules];
             for(const rule of rules){
                 const {be, having} = rule;
@@ -46,7 +66,7 @@ export class BeHaving extends EventTarget implements Actions{
                 const failures: any[] = [];
                 for(const imp of impls){
                     try{
-                        imp();
+                        await import(imp);
                         didImport = true;
                         break;
                     }catch(e){
@@ -64,10 +84,6 @@ export class BeHaving extends EventTarget implements Actions{
                     }
                 }
             }
-        }
-        return {
-            make: mergedMake,
-            readyToObserve: true,
         }
     }
 
@@ -168,6 +184,9 @@ define<PPP & BeDecoratedProps<PPP, Actions>, Actions>({
                 ifAllOf: ['make', 'readyToObserve'],
             },
             makeSelfBeExportable: 'loadScript',
+            doImports: {
+                ifAllOf: ['readyToObserve', 'loadScript', 'make']
+            },
             setReadyToObserve: {
                 ifAllOf: ['make'],
                 ifNoneOf: ['loadScript']

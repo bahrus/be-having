@@ -22,12 +22,12 @@ Apply element decorators / behaviors from a distance.
     import 'be-reformable/be-reformable.js';
 
     //someday (sigh), when the other two finally implement json modules, can switch to json
-    export const make = [() => import('my-package/make.js'), () => import('https://esm.run/my-package@0.0.123/make.js')]; 
+    export const make = ['my-package/make.js', 'https://esm.run/my-package@0.0.123/make.js']; 
     export const counted = {
-        impl:  () => import('be-counted/be-counted.js');
+        impl:  'be-counted/be-counted.js';
     };
     export const reformable = {
-        impl: [() => import('be-reformable/be-reformable.js'), () => import('https://esm.run/be-reformable@0.0.23')]
+        impl: ['be-reformable/be-reformable.js', 'https://esm.run/be-reformable@0.0.23']
     }
 
     export const formHavingProps = {
