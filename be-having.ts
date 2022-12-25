@@ -71,48 +71,57 @@ export class BeHaving extends EventTarget implements Actions{
         const fragment = await findRealm(self, scope) as DocumentFragment;
         if(fragment === null) throw '404: BH.makeBE';
         //const rootNode = self.getRootNode() as DocumentFragment;
-        this.#observer = new MutationObserver(mutations => {
-            mutations.forEach(({addedNodes}) => {
-                addedNodes.forEach(async node => {
-                    if(!(node instanceof Element)) return;
-                    for(const key in make){
-                        const rule = make[key];
-                        let cssSelector = key;
-                        if(hasCapitalLetterRegExp.test(key)){
-                            if(!this.#queries.has(key)){
-                                const {getQuery} = await import('trans-render/lib/specialKeys.js');
-                                this.#queries.set(key, getQuery(key));
+        const keys = Object.keys(make);
+        if(keys.length > 1 || keys[0] !== ':host'){
+            this.#observer = new MutationObserver(mutations => {
+                mutations.forEach(({addedNodes}) => {
+                    addedNodes.forEach(async node => {
+                        if(!(node instanceof Element)) return;
+                        for(const key in make){
+                            if(key === ':host') continue;
+                            const rule = make[key];
+                            let cssSelector = key;
+                            if(hasCapitalLetterRegExp.test(key)){
+                                if(!this.#queries.has(key)){
+                                    const {getQuery} = await import('trans-render/lib/specialKeys.js');
+                                    this.#queries.set(key, getQuery(key));
+                                }
+                                const qry = this.#queries.get(key)!;
+                                cssSelector = qry.query;
+                                
                             }
-                            const qry = this.#queries.get(key)!;
-                            cssSelector = qry.query;
-                            
+                            if(node.matches(cssSelector)){
+                                await this.#processEl(node, key, make);
+                            }
                         }
-                        if(node.matches(cssSelector)){
-                            await this.#processEl(node, key, make);
-                        }
-                    }
-                })
+                    })
+                });
             });
-        });
-        this.#observer.observe(fragment as Node, {
-            childList: true,
-            subtree: true,
-        });
+            this.#observer.observe(fragment as Node, {
+                childList: true,
+                subtree: true,
+            });
+        }
         for(const key in make){
-            let cssSelector = key;
-            const rule = make[key];
-
-            if(hasCapitalLetterRegExp.test(key)){
-                if(!this.#queries.has(key)){
-                    const {getQuery} = await import('trans-render/lib/specialKeys.js');
-                    this.#queries.set(key, getQuery(key));
+            
+            if(key === ':host'){
+                await this.#processEl((fragment as any).host, key, make);
+            }else{
+                const rule = make[key];
+                let cssSelector = key;
+                if(hasCapitalLetterRegExp.test(key)){
+                    if(!this.#queries.has(key)){
+                        const {getQuery} = await import('trans-render/lib/specialKeys.js');
+                        this.#queries.set(key, getQuery(key));
+                    }
+                    const qry = this.#queries.get(key)!;
+                    cssSelector = qry.query;
                 }
-                const qry = this.#queries.get(key)!;
-                cssSelector = qry.query;
+                fragment.querySelectorAll(cssSelector).forEach(async node => {
+                    await this.#processEl(node, key, make);
+                });
             }
-            fragment.querySelectorAll(cssSelector).forEach(async node => {
-                await this.#processEl(node, key, make);
-            })
+
         }
     }
     async #processEl(matchingEl: Element, key: string,  make: CSSSelectorBeHavingMap){
