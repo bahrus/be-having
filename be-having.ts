@@ -30,7 +30,7 @@ export class BeHaving extends EventTarget implements Actions{
             for(const externalMakePromise of externalMakePromises){
                 try{
                     const externalMake = await externalMakePromise();
-                    Object.assign(mergedMake, externalMake);
+                    Object.assign(mergedMake, externalMake.make);
                 }catch(e){}
             }
         }

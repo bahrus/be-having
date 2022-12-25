@@ -14,11 +14,23 @@ export class BeHaving extends EventTarget {
                 importSymbols: { on: 'load', of: self, }
             }];
     }
-    importSymbols(pp) {
+    async importSymbols(pp) {
         const { make, self } = pp;
         const exports = self._modExport;
-        for (const key in make) {
-            const ruleOrRules = make[key];
+        const mergedMake = make || {};
+        const externalMakePromiseOrPromises = exports.make;
+        if (externalMakePromiseOrPromises !== undefined) {
+            const externalMakePromises = Array.isArray(externalMakePromiseOrPromises) ? externalMakePromiseOrPromises : [externalMakePromiseOrPromises];
+            for (const externalMakePromise of externalMakePromises) {
+                try {
+                    const externalMake = await externalMakePromise();
+                    Object.assign(mergedMake, externalMake.make);
+                }
+                catch (e) { }
+            }
+        }
+        for (const key in mergedMake) {
+            const ruleOrRules = mergedMake[key];
             const rules = Array.isArray(ruleOrRules) ? ruleOrRules : [ruleOrRules];
             for (const rule of rules) {
                 const { be, having } = rule;
@@ -50,6 +62,7 @@ export class BeHaving extends EventTarget {
             }
         }
         return {
+            make: mergedMake,
             readyToObserve: true,
         };
     }
@@ -146,6 +159,7 @@ define({
             },
             makeSelfBeExportable: 'loadScript',
             setReadyToObserve: {
+                ifAllOf: ['make'],
                 ifNoneOf: ['loadScript']
             }
         },
