@@ -1,9 +1,9 @@
 import {BeDecoratedProps, MinimalProxy, EventConfigs} from 'be-decorated/types';
 import {CSSSelectorBeHavingMap, Scope} from 'trans-render/lib/types';
 export interface EndUserProps{
-    make: CSSSelectorBeHavingMap,
-    loadScript: boolean,
-    scope: Scope,
+    make?: CSSSelectorBeHavingMap,
+    loadScript?: boolean,
+    scope?: Scope,
 }
 
 export interface  VirtualProps extends EndUserProps, MinimalProxy{
@@ -25,9 +25,11 @@ export type PPE = [PPP, EventConfigs<Proxy, Actions>];
 export interface Actions{
     makeBe(pp: PP): void;
     makeSelfBeExportable(pp: PP): PPP | PPE;
-    importSymbols(pp: PP): PPP | PPE;
+    importSymbols(pp: PP): Promise<PPP | PPE>;
     setReadyToObserve(pp: PP): PPP;
 }
+
+
 
 export interface ImportConfig {
     impl: (() => void) | (() => void)[]; 

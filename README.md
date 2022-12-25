@@ -17,7 +17,8 @@ Apply element decorators / behaviors from a distance.
         }
     }
 }'> 
-    import 'be-reformable/be-reformable.js'
+    import 'be-reformable/be-reformable.js';
+    export const make = [() => import('my-package/make.js'), () => import('https://esm.run/my-package@0.0.123/make.js')]; //someday (sigh), when the other two finally implement json modules, can switch to json
     export const counted = {
         impl:  () => import('be-counted/be-counted.js');
     };

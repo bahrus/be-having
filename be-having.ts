@@ -20,11 +20,22 @@ export class BeHaving extends EventTarget implements Actions{
         }] as PPE;
     }
 
-    importSymbols(pp: PP): PPP | PPE {
+    async importSymbols(pp: PP): Promise<PPP | PPE> {
         const {make, self} = pp;
         const exports = (self as any)._modExport;
-        for(const key in make){
-            const ruleOrRules = make[key]
+        const mergedMake = make || {};
+        const externalMakePromiseOrPromises = exports.make as () => Promise<any> | (() => Promise<any>)[];
+        if(externalMakePromiseOrPromises !== undefined){
+            const externalMakePromises = Array.isArray(externalMakePromiseOrPromises) ? externalMakePromiseOrPromises : [externalMakePromiseOrPromises];
+            for(const externalMakePromise of externalMakePromises){
+                try{
+                    const externalMake = await externalMakePromise();
+                    Object.assign(mergedMake, externalMake);
+                }catch(e){}
+            }
+        }
+        for(const key in mergedMake){
+            const ruleOrRules = mergedMake[key]
             const rules = Array.isArray(ruleOrRules) ? ruleOrRules : [ruleOrRules];
             for(const rule of rules){
                 const {be, having} = rule;
@@ -55,6 +66,7 @@ export class BeHaving extends EventTarget implements Actions{
             }
         }
         return {
+            make: mergedMake,
             readyToObserve: true,
         }
     }
@@ -68,10 +80,10 @@ export class BeHaving extends EventTarget implements Actions{
     async makeBe(pp: PP){
         const {make, self, scope} = pp;
         const {findRealm} = await import('trans-render/lib/findRealm.js');
-        const fragment = await findRealm(self, scope) as DocumentFragment;
+        const fragment = await findRealm(self, scope!) as DocumentFragment;
         if(fragment === null) throw '404: BH.makeBE';
         //const rootNode = self.getRootNode() as DocumentFragment;
-        const keys = Object.keys(make);
+        const keys = Object.keys(make!);
         if(keys.length > 1 || keys[0] !== ':host'){
             this.#observer = new MutationObserver(mutations => {
                 mutations.forEach(({addedNodes}) => {
@@ -157,6 +169,7 @@ define<PPP & BeDecoratedProps<PPP, Actions>, Actions>({
             },
             makeSelfBeExportable: 'loadScript',
             setReadyToObserve: {
+                ifAllOf: ['make'],
                 ifNoneOf: ['loadScript']
             }
         },
