@@ -24,8 +24,8 @@
     "package-check": "package-check"
   },
   "dependencies": {
-    "be-decorated": "0.0.211",
-    "be-exportable": "0.0.53",
+    "be-decorated": "0.0.212",
+    "be-exportable": "0.0.54",
     "trans-render": "0.0.653"
   },
   "repository": {

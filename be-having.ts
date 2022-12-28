@@ -175,7 +175,7 @@ define<PPP & BeDecoratedProps<PPP, Actions>, Actions>({
             ifWantsToBe,
             upgrade,
             forceVisible: ['script'],
-            virtualProps: ['make', 'loadScript', 'scope'],
+            virtualProps: ['make', 'loadScript', 'scope', 'readyToObserve'],
             proxyPropDefaults:{
                 loadScript: true,
                 scope: 'rn'
