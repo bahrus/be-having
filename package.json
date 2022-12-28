@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "be-decorated": "0.0.211",
+    "be-exportable": "0.0.53",
     "trans-render": "0.0.653"
   },
   "repository": {

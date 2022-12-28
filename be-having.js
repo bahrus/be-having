@@ -3,13 +3,15 @@ import { define } from 'be-decorated/DE.js';
 export class BeHaving extends EventTarget {
     makeSelfBeExportable(pp) {
         const { self } = pp;
-        if (self._modExport) {
+        if (self.dataset.loaded) {
             return [{}, {
                     importMake: true,
                 }];
         }
-        self.setAttribute('be-exportable', '');
-        import('be-exportable/be-exportable.js');
+        if (self._modExport === undefined) {
+            self.setAttribute('be-exportable', '');
+            import('be-exportable/be-exportable.js');
+        }
         return [{}, {
                 importMake: { on: 'load', of: self, },
             }];

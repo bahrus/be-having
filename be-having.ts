@@ -8,13 +8,15 @@ export class BeHaving extends EventTarget implements Actions{
 
     makeSelfBeExportable(pp: ProxyProps){
         const {self} = pp;
-        if((self as any)._modExport){
+        if(self.dataset.loaded){
             return [{}, {
                 importMake: true,
             }] as PPE;
         }
-        self.setAttribute('be-exportable', '');
-        import('be-exportable/be-exportable.js');
+        if((<any>self)._modExport === undefined){
+            self.setAttribute('be-exportable', '');
+            import('be-exportable/be-exportable.js');
+        }
         return [{}, {
             importMake: {on: 'load', of: self, },
         }] as PPE;

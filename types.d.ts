@@ -6,11 +6,11 @@ export interface EndUserProps{
     scope?: Scope,
 }
 
-export interface  VirtualProps extends EndUserProps, MinimalProxy{
+export interface  VirtualProps extends EndUserProps, MinimalProxy<HTMLScriptElement>{
     readyToObserve: boolean,
 }
 
-export type Proxy = Element & VirtualProps;
+export type Proxy = HTMLScriptElement & VirtualProps;
 
 export interface ProxyProps extends VirtualProps{
     proxy: Proxy;
