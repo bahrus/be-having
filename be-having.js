@@ -3,7 +3,7 @@ import { define } from 'be-decorated/DE.js';
 export class BeHaving extends EventTarget {
     makeSelfBeExportable(pp) {
         const { self } = pp;
-        if (self.dataset.loaded) {
+        if (self.beDecorated?.exportable?.resolved) {
             return [{}, {
                     importMake: true,
                 }];

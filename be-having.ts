@@ -8,7 +8,7 @@ export class BeHaving extends EventTarget implements Actions{
 
     makeSelfBeExportable(pp: ProxyProps){
         const {self} = pp;
-        if(self.dataset.loaded){
+        if((<any>self).beDecorated?.exportable?.resolved){
             return [{}, {
                 importMake: true,
             }] as PPE;
