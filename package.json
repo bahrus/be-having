@@ -1,6 +1,6 @@
 {
   "name": "be-having",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Apply element decorators / behaviors from a distance.",
   "keywords": [
     "web-components",
