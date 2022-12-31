@@ -26,6 +26,11 @@ export class BeHaving extends EventTarget implements Actions{
         const {make, self} = pp;
         const exports = (self as any)._modExport;
         const mergedMake = make || {};
+        //waiting for good use case for this code (probably involving details elements)
+        // mergedMake['[be-having]'] = {
+        //     be: 'having',
+        //     having: {}
+        // };
         const externalMakePromiseOrPromises = exports.make as string | string[];
         if(externalMakePromiseOrPromises !== undefined){
             const externalMakePromises = Array.isArray(externalMakePromiseOrPromises) ? externalMakePromiseOrPromises : [externalMakePromiseOrPromises];
@@ -62,23 +67,30 @@ export class BeHaving extends EventTarget implements Actions{
             for(const rule of rules){
                 const {be, having} = rule;
                 const impConfig = exports[be] as ImportConfig;
-                const {impl} = impConfig;
-                const impls = Array.isArray(impl) ? impl : [impl];
-                let didImport = false;
-                const failures: any[] = [];
-                for(const imp of impls){
-                    try{
-                        await import(imp);
-                        didImport = true;
-                        break;
-                    }catch(e){
-                        console.debug(e);
-                        failures.push(e);
+                if(impConfig === undefined){
+                    if(customElements.get('be-' + be) === undefined){
+                        console.debug("No import for " + be + " specified.");
+                    }
+                }else{
+                    const {impl} = impConfig;
+                    const impls = Array.isArray(impl) ? impl : [impl];
+                    let didImport = false;
+                    const failures: any[] = [];
+                    for(const imp of impls){
+                        try{
+                            await import(imp);
+                            didImport = true;
+                            break;
+                        }catch(e){
+                            console.debug(e);
+                            failures.push(e);
+                        }
+                    }
+                    if(!didImport){
+                        throw {msg: 'Failure to import', impls, failures}
                     }
                 }
-                if(!didImport){
-                    throw {msg: 'Failure to import', impls, failures}
-                }
+
                 if(typeof having === 'string'){
                     const complexHaving = exports[having];
                     if(complexHaving !== undefined){
