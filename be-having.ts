@@ -61,15 +61,17 @@ export class BeHaving extends EventTarget implements Actions{
     async doImports(pp: PP){
         const {make, self} = pp;
         const exports = (self as any)._modExport;
+        const {lispToCamel} = await import('trans-render/lib/lispToCamel.js');
         for(const key in make){
             const ruleOrRules = make[key]
             const rules = Array.isArray(ruleOrRules) ? ruleOrRules : [ruleOrRules];
             for(const rule of rules){
                 const {be, having} = rule;
-                const impConfig = exports[be] as ImportConfig;
+                const camelBe = lispToCamel(be);
+                const impConfig = exports[camelBe] as ImportConfig;
                 if(impConfig === undefined){
                     if(customElements.get('be-' + be) === undefined){
-                        console.debug("No import for " + be + " specified.");
+                        console.debug("No import for " + camelBe + " specified.");
                     }
                 }else{
                     const {impl} = impConfig;
