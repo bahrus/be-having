@@ -35,6 +35,11 @@ Tree Context Menu:
 [html](https://github.com/bahrus/tree-context/blob/baseline/tree-context.html)
 [make.ts](https://github.com/bahrus/tree-context/blob/baseline/make.ts)
 
+Declarative-ish element that requires a little custom JavaScript in the class:
+
+[html, with the class defined within the script tag](https://github.com/bahrus/xtal-fig/blob/baseline/xtal-fig-parallelogram.html)
+[make.ts, which specifies the class name under "superclass"](https://github.com/bahrus/xtal-fig/blob/baseline/xtal-fig-parallelogram.make.ts)
+
 ## Example syntax
 
 The following example is a better introduction than the links above, in that the problem space it is solving is much smaller
