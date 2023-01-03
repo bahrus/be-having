@@ -1,5 +1,9 @@
 # be-having
 
+[![NPM version](https://badge.fury.io/js/be-importing.png)](http://badge.fury.io/js/be-having)
+[![How big is this package in your project?](https://img.shields.io/bundlephobia/minzip/be-having?style=for-the-badge)](https://bundlephobia.com/result?p=be-having)
+<img src="http://img.badgesize.io/https://cdn.jsdelivr.net/npm/be-having?compression=gzip">
+
 ## Apply element decorators / behaviors from a distance.
 
 *be-having* allows us to have our cake and eat it too.  Let me explain.
