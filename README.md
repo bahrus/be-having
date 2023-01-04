@@ -16,9 +16,9 @@ In a nutshell, be-having allows us to consolidate lots of little inline binding 
 
 1.  It becomes economical to edit the JSON blob as a single *make.mjs file, which, with the help of a build process, can be converted into a JSON import.  Even better, we can benefit from compile time checks, autosuggest editing if we use a *.make.mts during development, which TypeScript compiles into *.make.mjs, and then some [separate process](https://github.com/bahrus/may-it-be) compiles to a JSON blob file (make.json?).
 2.  This blob can be shared, and parsed once, in the case that the template it enhances is repeated multiple times throughout the page, which is often the case with web components.
-3.  The "non-verbal" spells defined by the make definition can be applied during template instantiation, if the dependencies have been loaded already (ideally), but if not, Ein Ba’aya, just apply the rules to the live DOM tree after template instantiation has completed (and the dependencies have finished loading post instantiation).
+3.  The "non-verbal" spells defined by the make definition can be applied during template instantiation, if the dependencies have been loaded already (ideally), but if not, *Ein Ba’aya*, just apply the rules to the live DOM tree after template instantiation has completed (and the dependencies have finished loading post instantiation).
 
-Unfortunately, support for JSON across browsers is coming slower than I would have ever expected, so the extra energy required to be backwards compatible doesn't seem worth it for now.  But please do apply a little "magical futuristic extrapolation" in the following discussion, when we talk about "make.ts." 
+Unfortunately, support for JSON module imports, across browsers, is coming slower than I would have ever expected, so the extra energy required to be backwards compatible doesn't seem worth it for now.  But please do apply a little "magical futuristic extrapolation" in the following discussion, when we talk about "make.ts." The end goal is for that file to be JSON, not JavaScript.
 
 be-having is a central player in supporting declarative custom elements.
 
