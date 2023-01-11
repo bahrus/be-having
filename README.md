@@ -41,8 +41,14 @@ Tree Context Menu:
 
 Declarative-ish element that requires a little custom JavaScript in the class:
 
-[html, with the class defined within the script tag](https://github.com/bahrus/xtal-fig/blob/baseline/xtal-fig-parallelogram.html)
-[make.ts, which specifies the class name under "superclass"](https://github.com/bahrus/xtal-fig/blob/baseline/xtal-fig-parallelogram.make.ts)
+[html, with the class defined within the script tag](https://github.com/bahrus/xtal-fig/blob/baseline/parallelogram/make.ts)
+[make.ts ](https://github.com/bahrus/xtal-fig/blob/baseline/parallelogram/root.html)
+
+Declarative-ish element that requires a little custom JavaScript in the class, using tertiary file:
+
+[html, with minimal clutter](https://github.com/bahrus/xtal-fig/blob/baseline/diamond/root.html)
+[make.ts ](https://github.com/bahrus/xtal-fig/blob/baseline/diamond/make.ts)
+[Diamond.ts](https://github.com/bahrus/xtal-fig/blob/baseline/diamond/DiamondVM.ts)
 
 ## Example syntax
 
@@ -64,6 +70,9 @@ The following example is a better introduction than the links above, in that the
     }
 }'> 
     import 'be-reformable/be-reformable.js';
+    import 'be-counted/be-counted.js';
+    
+    import {make} from 'my-package/make.js';
 
     //someday (sigh), when the other two browsers finally implement json modules, can switch to json
     export const make = ['my-package/make.js', 'https://esm.run/my-package@0.0.123/make.js']; 
