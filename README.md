@@ -89,3 +89,16 @@ The following example is a better introduction than the links above, in that the
 </script>
 ```
 
+## Awaiting [TODO]
+
+There are some scenarios where we really would rather wait for one or more dependencies to finish loading before proceeding with the instructions defined in the make file.
+
+To enable this, set await to true:
+
+```JavaScript
+export const inquiring = {
+    impl: ['be-inquiring/be-inquiring.js', 'https://esm.run/be-inquiring@1.2.3/be-inquiring.js'],
+    await: true,
+}
+```
+
