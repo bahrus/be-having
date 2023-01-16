@@ -7,7 +7,8 @@ export interface EndUserProps{
 }
 
 export interface  VirtualProps extends EndUserProps, MinimalProxy<HTMLScriptElement>{
-    readyToObserve: boolean,
+    readyToDoPreReqs: boolean;
+    readyToMakeBe: boolean,
 }
 
 export type Proxy = HTMLScriptElement & VirtualProps;
@@ -26,8 +27,9 @@ export interface Actions{
     makeBe(pp: PP): void;
     makeSelfBeExportable(pp: PP): PPP | PPE;
     importMake(pp: PP): Promise<PPP | PPE>;
-    doImports(pp: PP): Promise<void>;
-    setReadyToObserve(pp: PP): PPP;
+    doPreReqImports(pp: PP, mold: PPP): Promise<PPP>;
+    doAsyncImports(pp: PP): Promise<void>;
+    setReadyToMakeBe(pp: PP, mold: PPP): PPP;
 }
 
 

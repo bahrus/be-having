@@ -47,7 +47,6 @@ export class BeHaving extends EventTarget implements Actions{
                     failures.push(e);
                 }
             }
-            //TODO:  do all the other imports whose value of await is true;
             if(!didImport){
                 throw {msg: 'Failure to import', externalMakePromiseOrPromises, failures}
             }
@@ -55,11 +54,11 @@ export class BeHaving extends EventTarget implements Actions{
 
         return {
             make: mergedMake,
-            readyToObserve: true,
+            readyToDoPreReqs: true,
         }
     }
 
-    async doImports(pp: PP){
+    async doImports(pp: PP, wait?: boolean){
         const {make, self} = pp;
         const exports = (self as any)._modExport;
         const {lispToCamel} = await import('trans-render/lib/lispToCamel.js');
@@ -75,6 +74,7 @@ export class BeHaving extends EventTarget implements Actions{
                         console.debug("No import for " + camelBe + " specified.");
                     }
                 }else{
+                    if(wait !== !!impConfig.await) continue; 
                     const {impl} = impConfig;
                     const impls = Array.isArray(impl) ? impl : [impl];
                     let didImport = false;
@@ -104,8 +104,17 @@ export class BeHaving extends EventTarget implements Actions{
         }
     }
 
-    setReadyToObserve(pp: PP): PPP {
-        return {readyToObserve: true};
+    async doPreReqImports(pp: PP, mold: PPP) {
+        await this.doImports(pp, true);
+        return mold;
+    }
+
+    async doAsyncImports(pp: PP){
+        await this.doImports(pp, false);
+    }
+
+    setReadyToMakeBe(pp: PP, mold: PPP): PPP {
+        return mold;
     }
 
     #observer: MutationObserver | undefined;
@@ -190,24 +199,34 @@ define<PPP & BeDecoratedProps<PPP, Actions>, Actions>({
             ifWantsToBe,
             upgrade,
             forceVisible: ['script'],
-            virtualProps: ['make', 'loadScript', 'scope', 'readyToObserve'],
+            virtualProps: ['make', 'loadScript', 'scope', 'readyToMakeBe', 'readyToDoPreReqs'],
             proxyPropDefaults:{
                 loadScript: true,
                 scope: 'rn'
             }
         },
         actions: {
+            setReadyToMakeBe: {
+                ifAllOf: ['make'],
+                ifNoneOf: ['loadScript'],
+                returnObjMold: {
+                    readyToMakeBe: true,
+                }
+            },
+            doPreReqImports: {
+                ifAllOf: ['readyToDoPreReqs'],
+                returnObjMold: {
+                    readyToMakeBe: true
+                }
+            },
             makeBe: {
-                ifAllOf: ['make', 'readyToObserve'],
+                ifAllOf: ['make', 'readyToMakeBe'],
             },
             makeSelfBeExportable: 'loadScript',
-            doImports: {
-                ifAllOf: ['readyToObserve', 'loadScript', 'make']
+            doAsyncImports: {
+                ifAllOf: ['readyToMakeBe', 'loadScript', 'make']
             },
-            setReadyToObserve: {
-                ifAllOf: ['make'],
-                ifNoneOf: ['loadScript']
-            }
+
         },
     },
     complexPropDefaults: {

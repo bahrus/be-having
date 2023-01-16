@@ -48,10 +48,10 @@ export class BeHaving extends EventTarget {
         }
         return {
             make: mergedMake,
-            readyToObserve: true,
+            readyToDoPreReqs: true,
         };
     }
-    async doImports(pp) {
+    async doImports(pp, wait) {
         const { make, self } = pp;
         const exports = self._modExport;
         const { lispToCamel } = await import('trans-render/lib/lispToCamel.js');
@@ -68,6 +68,8 @@ export class BeHaving extends EventTarget {
                     }
                 }
                 else {
+                    if (wait !== !!impConfig.await)
+                        continue;
                     const { impl } = impConfig;
                     const impls = Array.isArray(impl) ? impl : [impl];
                     let didImport = false;
@@ -96,8 +98,15 @@ export class BeHaving extends EventTarget {
             }
         }
     }
-    setReadyToObserve(pp) {
-        return { readyToObserve: true };
+    async doPreReqImports(pp, mold) {
+        await this.doImports(pp, true);
+        return mold;
+    }
+    async doAsyncImports(pp) {
+        await this.doImports(pp, false);
+    }
+    setReadyToMakeBe(pp, mold) {
+        return mold;
     }
     #observer;
     #queries = new Map();
@@ -177,24 +186,33 @@ define({
             ifWantsToBe,
             upgrade,
             forceVisible: ['script'],
-            virtualProps: ['make', 'loadScript', 'scope', 'readyToObserve'],
+            virtualProps: ['make', 'loadScript', 'scope', 'readyToMakeBe', 'readyToDoPreReqs'],
             proxyPropDefaults: {
                 loadScript: true,
                 scope: 'rn'
             }
         },
         actions: {
+            setReadyToMakeBe: {
+                ifAllOf: ['make'],
+                ifNoneOf: ['loadScript'],
+                returnObjMold: {
+                    readyToMakeBe: true,
+                }
+            },
+            doPreReqImports: {
+                ifAllOf: ['readyToDoPreReqs'],
+                returnObjMold: {
+                    readyToMakeBe: true
+                }
+            },
             makeBe: {
-                ifAllOf: ['make', 'readyToObserve'],
+                ifAllOf: ['make', 'readyToMakeBe'],
             },
             makeSelfBeExportable: 'loadScript',
-            doImports: {
-                ifAllOf: ['readyToObserve', 'loadScript', 'make']
+            doAsyncImports: {
+                ifAllOf: ['readyToMakeBe', 'loadScript', 'make']
             },
-            setReadyToObserve: {
-                ifAllOf: ['make'],
-                ifNoneOf: ['loadScript']
-            }
         },
     },
     complexPropDefaults: {
