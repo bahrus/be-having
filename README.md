@@ -89,7 +89,7 @@ The following example is a better introduction than the links above, in that the
 </script>
 ```
 
-## Awaiting [TODO]
+## Awaiting [Untested]
 
 There are some scenarios where we really would rather wait for one or more dependencies to finish loading before proceeding with the instructions defined in the make file.
 
