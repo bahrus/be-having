@@ -34,4 +34,6 @@ export interface Actions{
 
 export interface ImportConfig {
     impl: string | string[]; 
+    /** Don't start applying the make rule until this resource has finished loading. */
+    await?: boolean;// [TODO];
 }
