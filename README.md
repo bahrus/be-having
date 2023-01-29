@@ -110,9 +110,9 @@ be-having supports a special selector:
 
 What this does: An element matches this selector if:
 
-1.  There exists an element whose id matches the tag name in the Shadow DOM realm. or
+1.  The element has an href attribute matching the tag name, and there exists an element whose id matches the tag name in the Shadow DOM realm. or
 2.  If the tag name matches a method name of the host, surrounded by angle brackets
 
-be-having will also remove attribute href if the element doesn't natively support the href property.  This allows developers to benefit from a little DX assistance, by adding href="#[id]" to the tag.  VS Code (and hopefully most decent HTML editors) provide support for jumping to the element.  
+be-having will also remove attribute href if the element doesn't natively support the href property once found.  This allows developers to benefit from a little DX assistance, by adding href="#[id]" to the tag.  VS Code (and hopefully most decent HTML editors) provide support for jumping to the element.  
 
 

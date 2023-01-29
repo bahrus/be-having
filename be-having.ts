@@ -171,11 +171,15 @@ export class BeHaving extends EventTarget implements Actions{
                 await this.#processEl((fragment as any).host, key, make);
             }else if(key === '<>'){
                 const {match} = await import('./match.js');
-                if(await match(node)){
-                    await this.#processEl(node, key, make);
-                }else{
-                    continue;
-                }
+                fragment.querySelectorAll('[href^="#"]').forEach(async node => {
+                    if(await match(node)){
+                        if((<any>node).href === undefined){
+                            node.removeAttribute('href');
+                        }
+                        await this.#processEl(node, key, make);
+                    }
+                    
+                })
             }else{
                 const rule = make[key];
                 let cssSelector = key;

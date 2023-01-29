@@ -127,6 +127,15 @@ export class BeHaving extends EventTarget {
                         for (const key in make) {
                             if (key === ':host')
                                 continue;
+                            if (key === '<>') {
+                                const { match } = await import('./match.js');
+                                if (await match(node)) {
+                                    await this.#processEl(node, key, make);
+                                }
+                                else {
+                                    continue;
+                                }
+                            }
                             const rule = make[key];
                             let cssSelector = key;
                             if (hasCapitalLetterRegExp.test(key)) {
@@ -141,6 +150,7 @@ export class BeHaving extends EventTarget {
                                 await this.#processEl(node, key, make);
                             }
                         }
+                        //check for matching host method or template id
                     });
                 });
             });
@@ -152,6 +162,17 @@ export class BeHaving extends EventTarget {
         for (const key in make) {
             if (key === ':host') {
                 await this.#processEl(fragment.host, key, make);
+            }
+            else if (key === '<>') {
+                const { match } = await import('./match.js');
+                fragment.querySelectorAll('[href^="#"]').forEach(async (node) => {
+                    if (await match(node)) {
+                        if (node.href === undefined) {
+                            node.removeAttribute('href');
+                        }
+                        await this.#processEl(node, key, make);
+                    }
+                });
             }
             else {
                 const rule = make[key];
