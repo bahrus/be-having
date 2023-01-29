@@ -104,12 +104,15 @@ export const inquiring = {
 
 ## Linking Tags to Templates or host methods (for example)
 
-*be-having* also provides another useful service that can be used by other decorators:
+be-having supports a special selector:
 
-Since be-having utilizes a mutation observer on all new elements, it checks with each new tag it sees if:
+"<>": 
 
-1.  It searches for an element whose id matches the tag name.
-2.  If 1 doesn't match, it checks if the tag name matches a method name of the host, surrounded by angle brackets
+What this does: An element matches this selector if:
 
-If either of them match, it passes the element to [be-spawn-of](https://github.com/bahrus/be-spawn-of).
+1.  There exists an element whose id matches the tag name in the Shadow DOM realm. or
+2.  If the tag name matches a method name of the host, surrounded by angle brackets
+
+be-having will also remove attribute href if the element doesn't natively support the href property.  This allows developers to benefit from a little DX assistance, by adding href="#[id]" to the tag.  VS Code (and hopefully most decent HTML editors) provide support for jumping to the element.  
+
 

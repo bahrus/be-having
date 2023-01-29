@@ -133,6 +133,14 @@ export class BeHaving extends EventTarget implements Actions{
                         if(!(node instanceof Element)) return;
                         for(const key in make){
                             if(key === ':host') continue;
+                            if(key === '<>'){
+                                const {match} = await import('./match.js');
+                                if(await match(node)){
+                                    await this.#processEl(node, key, make);
+                                }else{
+                                    continue;
+                                }
+                            }
                             const rule = make[key];
                             let cssSelector = key;
                             if(hasCapitalLetterRegExp.test(key)){
@@ -161,6 +169,13 @@ export class BeHaving extends EventTarget implements Actions{
             
             if(key === ':host'){
                 await this.#processEl((fragment as any).host, key, make);
+            }else if(key === '<>'){
+                const {match} = await import('./match.js');
+                if(await match(node)){
+                    await this.#processEl(node, key, make);
+                }else{
+                    continue;
+                }
             }else{
                 const rule = make[key];
                 let cssSelector = key;
