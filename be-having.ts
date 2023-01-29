@@ -148,7 +148,8 @@ export class BeHaving extends EventTarget implements Actions{
                                 await this.#processEl(node, key, make);
                             }
                         }
-                    })
+                        //check for matching host method or template id
+                    });
                 });
             });
             this.#observer.observe(fragment as Node, {

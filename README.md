@@ -108,10 +108,8 @@ export const inquiring = {
 
 Since be-having utilizes a mutation observer on all new elements, it checks with each new tag it sees if:
 
-1.  The tag name matches a method name of the host, surrounded by angle brackets
-2.  If 1 doesn't match, it searches for an element whose id matches the tag name. 
+1.  It searches for an element whose id matches the tag name.
+2.  If 1 doesn't match, it checks if the tag name matches a method name of the host, surrounded by angle brackets
 
-If either of them match, it adds attribute "be-spawn-of=[localName]" to the matching element.  It also causes the element to emit event:  "be-decorated.having.be-spawn-of
-
-This can optionally be picked up by [be-spawn-of](https://github.com/bahrus/be-spawn-of).
+If either of them match, it passes the element to [be-spawn-of](https://github.com/bahrus/be-spawn-of).
 
