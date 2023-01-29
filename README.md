@@ -50,7 +50,7 @@ Declarative-ish element that requires a little custom JavaScript in the class, u
 [make.ts ](https://github.com/bahrus/xtal-fig/blob/baseline/diamond/make.ts)
 [Diamond.ts](https://github.com/bahrus/xtal-fig/blob/baseline/diamond/DiamondVM.ts)
 
-## Example syntax
+## Lingo
 
 The following example is a better introduction than the links above, in that the problem space it is solving is much smaller
 
@@ -101,4 +101,17 @@ export const inquiring = {
     await: true,
 }
 ```
+
+## Linking Tags to Templates or host methods (for example)
+
+*be-having* also provides another useful service that can be used by other decorators:
+
+Since be-having utilizes a mutation observer on all new elements, it checks with each new tag it sees if:
+
+1.  The tag name matches a method name of the host, surrounded by angle brackets
+2.  If 1 doesn't match, it searches for an element whose id matches the tag name. 
+
+If either of them match, it adds attribute "be-spawn-of=[localName]" to the matching element.  It also causes the element to emit event:  "be-decorated.having.be-spawn-of
+
+This can optionally be picked up by [be-spawn-of](https://github.com/bahrus/be-spawn-of).
 
