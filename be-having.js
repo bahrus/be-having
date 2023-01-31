@@ -61,33 +61,39 @@ export class BeHaving extends EventTarget {
             for (const rule of rules) {
                 const { be, having } = rule;
                 const camelBe = lispToCamel(be);
-                const impConfig = exports[camelBe];
-                if (impConfig === undefined) {
-                    if (customElements.get('be-' + be) === undefined) {
-                        console.debug("No import for " + camelBe + " specified.");
+                let impConfig = exports[camelBe];
+                switch (typeof impConfig) {
+                    case 'undefined':
+                        if (customElements.get('be-' + be) === undefined) {
+                            console.debug("No import for " + camelBe + " specified.");
+                        }
+                        continue;
+                    case 'boolean': {
+                        impConfig = {
+                            impl: [`be-${be}/be-${be}.js`, `https://esm.run/be-${be}`],
+                        };
+                        break;
                     }
                 }
-                else {
-                    if (wait !== !!impConfig.await)
-                        continue;
-                    const { impl } = impConfig;
-                    const impls = Array.isArray(impl) ? impl : [impl];
-                    let didImport = false;
-                    const failures = [];
-                    for (const imp of impls) {
-                        try {
-                            await import(imp);
-                            didImport = true;
-                            break;
-                        }
-                        catch (e) {
-                            console.debug(e);
-                            failures.push(e);
-                        }
+                if (wait !== !!impConfig.await)
+                    continue;
+                const { impl } = impConfig;
+                const impls = Array.isArray(impl) ? impl : [impl];
+                let didImport = false;
+                const failures = [];
+                for (const imp of impls) {
+                    try {
+                        await import(imp);
+                        didImport = true;
+                        break;
                     }
-                    if (!didImport) {
-                        throw { msg: 'Failure to import', impls, failures };
+                    catch (e) {
+                        console.debug(e);
+                        failures.push(e);
                     }
+                }
+                if (!didImport) {
+                    throw { msg: 'Failure to import', impls, failures };
                 }
                 if (typeof having === 'string') {
                     const complexHaving = exports[having];
@@ -128,8 +134,13 @@ export class BeHaving extends EventTarget {
                             if (key === ':host')
                                 continue;
                             if (key === '<>') {
+                                if (!node.hasAttribute('href'))
+                                    continue;
                                 const { match } = await import('./match.js');
                                 if (await match(node)) {
+                                    if (node.href === undefined) {
+                                        node.removeAttribute('href');
+                                    }
                                     await this.#processEl(node, key, make);
                                 }
                                 else {
