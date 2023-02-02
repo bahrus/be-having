@@ -116,6 +116,39 @@ export class BeHaving extends EventTarget {
     }
     #observer;
     #queries = new Map();
+    async #processNode(make, node) {
+        for (const key in make) {
+            if (key === ':host')
+                continue;
+            if (key === '<>') {
+                //await this.#processForSpawns(node, key, make);
+                if (!node.hasAttribute('href'))
+                    continue;
+                //console.log({node});
+                const { match } = await import('./match.js');
+                if (await match(node)) {
+                    if (node.href === undefined) {
+                        node.removeAttribute('href');
+                    }
+                    await this.#processEl(node, key, make);
+                }
+                continue;
+            }
+            const rule = make[key];
+            let cssSelector = key;
+            if (hasCapitalLetterRegExp.test(key)) {
+                if (!this.#queries.has(key)) {
+                    const { getQuery } = await import('trans-render/lib/specialKeys.js');
+                    this.#queries.set(key, getQuery(key));
+                }
+                const qry = this.#queries.get(key);
+                cssSelector = qry.query;
+            }
+            if (node.matches(cssSelector)) {
+                await this.#processEl(node, key, make);
+            }
+        }
+    }
     async makeBe(pp) {
         const { make, self, scope } = pp;
         const { findRealm } = await import('trans-render/lib/findRealm.js');
@@ -130,36 +163,10 @@ export class BeHaving extends EventTarget {
                     addedNodes.forEach(async (node) => {
                         if (!(node instanceof Element))
                             return;
-                        for (const key in make) {
-                            if (key === ':host')
-                                continue;
-                            if (key === '<>') {
-                                if (!node.hasAttribute('href'))
-                                    continue;
-                                const { match } = await import('./match.js');
-                                if (await match(node)) {
-                                    if (node.href === undefined) {
-                                        node.removeAttribute('href');
-                                    }
-                                    await this.#processEl(node, key, make);
-                                }
-                                else {
-                                    continue;
-                                }
-                            }
-                            const rule = make[key];
-                            let cssSelector = key;
-                            if (hasCapitalLetterRegExp.test(key)) {
-                                if (!this.#queries.has(key)) {
-                                    const { getQuery } = await import('trans-render/lib/specialKeys.js');
-                                    this.#queries.set(key, getQuery(key));
-                                }
-                                const qry = this.#queries.get(key);
-                                cssSelector = qry.query;
-                            }
-                            if (node.matches(cssSelector)) {
-                                await this.#processEl(node, key, make);
-                            }
+                        await this.#processNode(make, node);
+                        const nodes = document.createTreeWalker(node, NodeFilter.SHOW_ELEMENT);
+                        while (nodes.nextNode()) {
+                            await this.#processNode(make, nodes.currentNode);
                         }
                         //check for matching host method or template id
                     });
@@ -175,12 +182,16 @@ export class BeHaving extends EventTarget {
                 await this.#processEl(fragment.host, key, make);
             }
             else if (key === '<>') {
+                //await this.#processForSpawns(fragment, key, make);
                 const { match } = await import('./match.js');
                 fragment.querySelectorAll('[href^="#"]').forEach(async (node) => {
+                    console.log({ node });
                     if (await match(node)) {
+                        const id = node.getAttribute('href').substring(1);
                         if (node.href === undefined) {
                             node.removeAttribute('href');
                         }
+                        node.setAttribute('data-spawn-of', id);
                         await this.#processEl(node, key, make);
                     }
                 });
