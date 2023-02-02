@@ -189,7 +189,6 @@ export class BeHaving extends EventTarget {
                 //await this.#processForSpawns(fragment, key, make);
                 //const {match} = await import('./match.js');
                 fragment.querySelectorAll('[href^="#"]').forEach(async (node) => {
-                    //console.log({node});
                     await this.#makeSpawnOf(node, key, make);
                 });
             }
