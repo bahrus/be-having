@@ -116,6 +116,17 @@ export class BeHaving extends EventTarget {
     }
     #observer;
     #queries = new Map();
+    async #makeSpawnOf(node, key, make) {
+        const { match } = await import('./match.js');
+        if (await match(node)) {
+            const id = node.getAttribute('href').substring(1);
+            if (node.href === undefined) {
+                node.removeAttribute('href');
+            }
+            node.setAttribute('data-spawn-of', id);
+            await this.#processEl(node, key, make);
+        }
+    }
     async #processNode(make, node) {
         for (const key in make) {
             if (key === ':host')
@@ -124,14 +135,7 @@ export class BeHaving extends EventTarget {
                 //await this.#processForSpawns(node, key, make);
                 if (!node.hasAttribute('href'))
                     continue;
-                //console.log({node});
-                const { match } = await import('./match.js');
-                if (await match(node)) {
-                    if (node.href === undefined) {
-                        node.removeAttribute('href');
-                    }
-                    await this.#processEl(node, key, make);
-                }
+                await this.#makeSpawnOf(node, key, make);
                 continue;
             }
             const rule = make[key];
@@ -183,17 +187,10 @@ export class BeHaving extends EventTarget {
             }
             else if (key === '<>') {
                 //await this.#processForSpawns(fragment, key, make);
-                const { match } = await import('./match.js');
+                //const {match} = await import('./match.js');
                 fragment.querySelectorAll('[href^="#"]').forEach(async (node) => {
-                    console.log({ node });
-                    if (await match(node)) {
-                        const id = node.getAttribute('href').substring(1);
-                        if (node.href === undefined) {
-                            node.removeAttribute('href');
-                        }
-                        node.setAttribute('data-spawn-of', id);
-                        await this.#processEl(node, key, make);
-                    }
+                    //console.log({node});
+                    await this.#makeSpawnOf(node, key, make);
                 });
             }
             else {

@@ -128,20 +128,24 @@ export class BeHaving extends EventTarget implements Actions{
 
     #observer: MutationObserver | undefined;
     #queries: Map<string, QueryInfo> = new Map();
+    async #makeSpawnOf(node: Element, key: string, make: CSSSelectorBeHavingMap){
+        const {match} = await import('./match.js');
+        if(await match(node)){
+            const id = (node as Element).getAttribute('href')!.substring(1);
+            if((<any>node).href === undefined){
+                node.removeAttribute('href');
+            }
+            (node as Element).setAttribute('data-spawn-of', id);
+            await this.#processEl(node, key, make);
+        }
+    }
     async #processNode(make: CSSSelectorBeHavingMap, node: Element){
         for(const key in make){
             if(key === ':host') continue;
             if(key === '<>'){
                 //await this.#processForSpawns(node, key, make);
                 if(!node.hasAttribute('href')) continue;
-                //console.log({node});
-                const {match} = await import('./match.js');
-                if(await match(node)){
-                    if((<any>node).href === undefined){
-                        node.removeAttribute('href');
-                    }
-                    await this.#processEl(node, key, make);
-                }
+                await this.#makeSpawnOf(node, key, make);
                 continue;
             }
             const rule = make[key];
@@ -193,18 +197,10 @@ export class BeHaving extends EventTarget implements Actions{
                 await this.#processEl((fragment as any).host, key, make);
             }else if(key === '<>'){
                 //await this.#processForSpawns(fragment, key, make);
-                const {match} = await import('./match.js');
+                //const {match} = await import('./match.js');
                 fragment.querySelectorAll('[href^="#"]').forEach(async node => {
-                    console.log({node});
-                    if(await match(node)){
-                        const id = (node as Element).getAttribute('href')!.substring(1);
-                        if((<any>node).href === undefined){
-                            node.removeAttribute('href');
-                        }
-                        (node as Element).setAttribute('data-spawn-of', id);
-                        await this.#processEl(node, key, make);
-                    }
-                    
+                    //console.log({node});
+                    await this.#makeSpawnOf(node, key, make);
                 });
             }else{
                 const rule = make[key];
