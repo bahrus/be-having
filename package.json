@@ -24,18 +24,18 @@
     "package-check": "package-check"
   },
   "dependencies": {
-    "be-decorated": "0.0.222",
-    "be-exportable": "0.0.62",
+    "be-decorated": "0.0.235",
+    "be-exportable": "0.0.66",
     "be-spawn-of": "0.0.0",
-    "trans-render": "0.0.664"
+    "trans-render": "0.0.670"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bahrus/be-having.git"
   },
   "devDependencies": {
-    "may-it-serve": "0.0.4",
-    "@playwright/test": "1.30.0",
+    "may-it-serve": "0.0.5",
+    "@playwright/test": "1.31.2",
     "@skypack/package-check": "0.2.2"
   },
   "author": "",
