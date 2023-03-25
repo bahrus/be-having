@@ -24,10 +24,10 @@
     "package-check": "package-check"
   },
   "dependencies": {
-    "be-decorated": "0.0.235",
-    "be-exportable": "0.0.66",
-    "be-spawn-of": "0.0.0",
-    "trans-render": "0.0.670"
+    "be-decorated": "0.0.237",
+    "be-exportable": "0.0.67",
+    "be-spawn-of": "0.0.1",
+    "trans-render": "0.0.671"
   },
   "repository": {
     "type": "git",
@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "may-it-serve": "0.0.5",
-    "@playwright/test": "1.31.2",
+    "@playwright/test": "1.32.1",
     "@skypack/package-check": "0.2.2"
   },
   "author": "",
